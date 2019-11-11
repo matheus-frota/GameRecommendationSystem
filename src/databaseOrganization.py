@@ -1,4 +1,5 @@
 import pandas as pd
+import matplotlib.pyplot as plt
 import os
 
 dataPath = "./Github/GameRecommendationSystem/data/"
@@ -14,16 +15,12 @@ def treatDataset():
     nameGameUnique = df["gameName"].unique()
     nameGameID = {Game:GameID for GameID,Game in zip(range(1,len(nameGameUnique)),nameGameUnique)}
     df["gameNameID"] = df["gameName"].replace(nameGameID)
-    return df
+    return df, nameGameID
 
 def filterDataset(mostPlayed = 0.2):
-    df = treatDataset()
+    df, nameGameID = treatDataset()
     numberUniqueGames = len(df["gameNameID"].unique())
     selectedQuantity = int(numberUniqueGames*mostPlayed)
     gameSelect = df.groupby(["gameNameID"])["userID"].count().sort_values(ascending = False)[:selectedQuantity].keys()
     sparseMatrix = df.pivot_table(index='gameNameID',columns='userID',values='hours').fillna(0)
-    return sparseMatrix.iloc[gameSelect]
-
-
-
-filterDataset()
+    return pd.DataFrame(sparseMatrix.iloc[gameSelect]), nameGameID
