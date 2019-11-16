@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 import os
 
@@ -7,20 +8,20 @@ dataName = "steamGames.csv"
 
 def openCSV():
     columnsNames = ["userID","gameName","purchase","hours","delete"]
-    df = pd.read_csv("C:/Users/Matheus/Desktop/Github/GameRecommendationSystem/data/steamGames.csv", names=columnsNames)
-    return df.query("purchase == 'play'").drop(["purchase","delete"],axis = 1)
+    gamesDataBase = pd.read_csv("C:/Users/Matheus/Desktop/Github/GameRecommendationSystem/data/steamGames.csv", names=columnsNames)
+    return gamesDataBase.query("purchase == 'play'").drop(["purchase","delete"],axis = 1)
 
 def treatDataset():
-    df = filterDataset()
-    nameGameUnique = df.index.unique()
+    sparseMatrixGamesDataBase = filterDataset()
+    nameGameUnique = sparseMatrixGamesDataBase.index.unique()
     nameGameID = {Game:GameID for GameID,Game in zip(range(1,len(nameGameUnique)+1),nameGameUnique)}
-    df = df.rename(index = nameGameID)
-    return df, nameGameID
+    sparseMatrixGamesDataBase = sparseMatrixGamesDataBase.rename(index = nameGameID)
+    return sparseMatrixGamesDataBase, nameGameID
 
 def filterDataset(mostPlayed = 0.2):
-    df = openCSV()
-    numberUniqueGames = len(df["gameName"].unique())
+    gamesDataBase = openCSV()
+    numberUniqueGames = len(gamesDataBase["gameName"].unique())
     selectedQuantity = int(numberUniqueGames*mostPlayed)
-    gameSelect = df.groupby(["gameName"])["userID"].count().sort_values(ascending = False)[:selectedQuantity].keys()
-    sparseMatrix = df.pivot_table(index='gameName',columns='userID',values='hours').fillna(0)
+    gameSelect = gamesDataBase.groupby(["gameName"])["userID"].count().sort_values(ascending = False)[:selectedQuantity].keys()
+    sparseMatrix = gamesDataBase.pivot_table(index='gameName',columns='userID',values='hours').fillna(0)
     return sparseMatrix.loc[gameSelect]
