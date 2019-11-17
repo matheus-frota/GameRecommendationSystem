@@ -11,6 +11,9 @@ def openCSV():
     gamesDataBase = pd.read_csv("C:/Users/Matheus/Desktop/Github/GameRecommendationSystem/data/steamGames.csv", names=columnsNames)
     return gamesDataBase.query("purchase == 'play'").drop(["purchase","delete"],axis = 1)
 
+def usersWithNoPlayTime(sparseMatrixGamesDataBase):
+    return [user for user,meanTime in sparseMatrixGamesDataBase.apply(np.mean).items() if meanTime == 0]
+
 def treatDataset():
     sparseMatrixGamesDataBase = filterDataset()
     nameGameUnique = sparseMatrixGamesDataBase.index.unique()
@@ -18,10 +21,15 @@ def treatDataset():
     sparseMatrixGamesDataBase = sparseMatrixGamesDataBase.rename(index = nameGameID)
     return sparseMatrixGamesDataBase, nameGameID
 
-def filterDataset(mostPlayed = 0.2):
+def filterDataset(mostPlayed = 0.1):
     gamesDataBase = openCSV()
     numberUniqueGames = len(gamesDataBase["gameName"].unique())
-    selectedQuantity = int(numberUniqueGames*mostPlayed)
-    gameSelect = gamesDataBase.groupby(["gameName"])["userID"].count().sort_values(ascending = False)[:selectedQuantity].keys()
+    numberUniqueUsers = len(gamesDataBase["userID"].unique())
+    selectedQuantityGames = int(numberUniqueGames*mostPlayed)
+    selectedQuantityUsers = int(numberUniqueUsers*mostPlayed*2)
+    gameSelect = gamesDataBase.groupby(["gameName"])["userID"].count().sort_values(ascending = False)[:selectedQuantityGames].keys()
+    userSelect = gamesDataBase.groupby(["userID"])["gameName"].count().sort_values(ascending = False)[:selectedQuantityUsers].keys()
     sparseMatrix = gamesDataBase.pivot_table(index='gameName',columns='userID',values='hours').fillna(0)
-    return sparseMatrix.loc[gameSelect]
+    usersNoPlayTime = usersWithNoPlayTime(sparseMatrix)
+    sparseMatrix = sparseMatrix.drop(usersNoPlayTime, axis = 1)
+    return sparseMatrix.loc[gameSelect,userSelect]

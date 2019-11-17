@@ -1,51 +1,39 @@
 import pandas as pd
 import databaseOrganization as do
-from difflib import SequenceMatcher
 import numpy as np
-
-
-def euclidianDistance(x,y):
-    return np.sqrt(np.sum((y - x)**2))
-
-def cosineSimilarity(x,y):
-    return np.sqrt(np.sum(x*y))/(np.sqrt(np.sum(x**2))*np.sqrt(np.sum(y**2)))
-
-# Definindo função ordenarDicionario().
-def ordenarValoresDicionario(dicionario):
-    # Variavel auxiliar
-    armazenarResultadoOrdenado = []
-    for i in sorted(dicionario, key = dicionario.get, reverse = False):
-        armazenarResultadoOrdenado.append((i,dicionario[i]))
-    return armazenarResultadoOrdenado
+import utilits
 
 def train(data, gameNameData):
     distanceGames = {}
     gameNameX = data[data.index == gameNameData].values
     gameNameX = np.asarray(gameNameX).ravel()
     for index,gameNameY in data.iterrows():
-        distanceGames[index] = cosineSimilarity(gameNameX,gameNameY.values)
-    return ordenarValoresDicionario(distanceGames)    
-    
-
-def similarNames(gameNameUser, allGamesName):
-    gamesSimilarNames = []
-    for gameNameBase in allGamesName:
-        if SequenceMatcher(None,gameNameUser,gameNameBase).ratio() >= 0.75:
-            gamesSimilarNames.append(gameNameBase)
-    if len(gamesSimilarNames) == 0:
-        return None
-    else:
-        print("Jogo(s) encontrado no banco de dados: {}".format(gamesSimilarNames))
-        return allGamesName[gamesSimilarNames[0]]
+        distanceGames[index] = utilits.cosineSimilarity(gameNameX,gameNameY.values)
+    return utilits.sortValueDict(distanceGames)
 
 def recommender(k, gameNameUser):
     data, nameGameID = do.treatDataset()
-    gamesNameData = similarNames(gameNameUser, nameGameID)
+    trainData, testData = trainTestSplit(data)
+    gamesNameData = utilits.similarNames(gameNameUser, nameGameID)
     if gamesNameData == None:
         print("Nenhum jogo com esse nome foi encontrado!")
     else:
-        gamesRecommender = train(data,gamesNameData)
+        gamesRecommender = train(trainData,gamesNameData)
         replaceID = {ID:name for name,ID in zip(nameGameID.keys(),nameGameID.values())}
+        print("-----Recomendações-----\n")
         for game in gamesRecommender[1:k+1]:
-            print(replaceID[game[0]])
-        
+            amountPlayersGames = validation(game[0],gamesNameData,testData)
+            print("{} - {} usuário(s) possuem ambos os jogos!".format(replaceID[game[0]],amountPlayersGames))
+
+def trainTestSplit(data, split = 0.4):
+    numberColumns = len(data.columns)
+    columnsPermutation = np.random.permutation(numberColumns)
+    trainColumns = columnsPermutation[int(numberColumns*split):]
+    testColumns = columnsPermutation[:int(numberColumns*split)]
+    return data.iloc[:,trainColumns],data.iloc[:,testColumns]
+
+def validation(nameGameRecommender, nameGameUser, testData):
+    validationData = testData.loc[[nameGameUser,nameGameRecommender],:].copy()
+    validationDataTranspose = validationData.T
+    userFilterWithBothGames = validationDataTranspose[(validationDataTranspose[nameGameUser] != 0) & (validationDataTranspose[nameGameRecommender] != 0)]
+    return userFilterWithBothGames.shape[0]
