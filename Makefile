@@ -1,6 +1,5 @@
 ## Constants
 PWD := $(shell pwd)
-CONTAINER := /home/jovyan
 VOLUME_NOTEBOOKS := $(PWD)/analysis
 HOST_NOTEBOOKS := /home/jovyan
 
