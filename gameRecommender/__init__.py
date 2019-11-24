@@ -1,0 +1,1 @@
+__import__('gameRecommender').declare_namespace(['knnRecommender','app'])

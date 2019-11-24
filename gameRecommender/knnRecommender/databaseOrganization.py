@@ -1,6 +1,5 @@
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
+import pandas
+import numpy
 import os
 
 dataPath = "./Github/GameRecommendationSystem/data/"
@@ -8,11 +7,11 @@ dataName = "steamGames.csv"
 
 def openCSV():
     columnsNames = ["userID","gameName","purchase","hours","delete"]
-    gamesDataBase = pd.read_csv("C:/Users/Matheus/Desktop/Github/GameRecommendationSystem/data/steamGames.csv", names=columnsNames)
+    gamesDataBase = pandas.read_csv("C:/Users/Matheus/Desktop/Github/GameRecommendationSystem/data/steamGames.csv", names=columnsNames)
     return gamesDataBase.query("purchase == 'play'").drop(["purchase","delete"],axis = 1)
 
 def usersWithNoPlayTime(sparseMatrixGamesDataBase):
-    return [user for user,meanTime in sparseMatrixGamesDataBase.apply(np.mean).items() if meanTime == 0]
+    return [user for user,meanTime in sparseMatrixGamesDataBase.apply(numpy.mean).items() if meanTime == 0]
 
 def treatDataset():
     sparseMatrixGamesDataBase = filterDataset()

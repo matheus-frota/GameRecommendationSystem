@@ -1,20 +1,21 @@
-import pandas as pd
-import databaseOrganization as do
-import numpy as np
-import utilits
+#import pandas as pd
+#import databaseOrganization as do
+from knnRecommender.databaseOrganization import treatDataset
+import numpy
+from knnRecommender.utilits import cosineSimilarity, sortValueDict, similarNames
 
 def train(data, gameNameData):
     distanceGames = {}
     gameNameX = data[data.index == gameNameData].values
-    gameNameX = np.asarray(gameNameX).ravel()
+    gameNameX = numpy.asarray(gameNameX).ravel()
     for index,gameNameY in data.iterrows():
-        distanceGames[index] = utilits.cosineSimilarity(gameNameX,gameNameY.values)
-    return utilits.sortValueDict(distanceGames)
+        distanceGames[index] = cosineSimilarity(gameNameX,gameNameY.values)
+    return sortValueDict(distanceGames)
 
 def recommender(k, gameNameUser):
-    data, nameGameID = do.treatDataset()
+    data, nameGameID = treatDataset()
     trainData, testData = trainTestSplit(data)
-    gamesNameData = utilits.similarNames(gameNameUser, nameGameID)
+    gamesNameData = similarNames(gameNameUser, nameGameID)
     if gamesNameData == None:
         print("Nenhum jogo com esse nome foi encontrado!")
     else:
@@ -27,7 +28,7 @@ def recommender(k, gameNameUser):
 
 def trainTestSplit(data, split = 0.4):
     numberColumns = len(data.columns)
-    columnsPermutation = np.random.permutation(numberColumns)
+    columnsPermutation = numpy.random.permutation(numberColumns)
     trainColumns = columnsPermutation[int(numberColumns*split):]
     testColumns = columnsPermutation[:int(numberColumns*split)]
     return data.iloc[:,trainColumns],data.iloc[:,testColumns]
