@@ -25,7 +25,9 @@ make run
 
 ### Analysis Preview
 
-``
+If you want to see my analyzes performed on the database, just run this command.
+
+``shell
 make jupyter
 ``
 
