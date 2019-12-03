@@ -3,12 +3,12 @@
 from databaseOrganization import treatDataset
 import numpy
 import pandas
-from utilits import cosineSimilarity, sortValueDict, similarNames
+from utilits import meanUpperTriangleMatrix, cosineSimilarityMatrix, cosineSimilarity, sortValueDict, similarNames
 
 def train(data, gameNameData):
     distanceGames = {}
     gameNameX = data[data.index == gameNameData].values
-    gameNameX = numpy.asarray(gameNameX).ravel()
+    #gameNameX = numpy.asarray(gameNameX).ravel()
     for index,gameNameY in data.iterrows():
         distanceGames[index] = cosineSimilarity(gameNameX,gameNameY.values)
     return sortValueDict(distanceGames), pandas.DataFrame.from_dict(distanceGames, orient = 'index')
@@ -23,7 +23,6 @@ def recommender(k, gameNameUser):
     else:
         gamesRecommender,_ = train(trainData,gamesNameData)
         replaceID = {ID:name for name,ID in zip(nameGameID.keys(),nameGameID.values())}
-        personalization(trainData,gamesNameData, replaceID)
         print("-----Recomendações-----\n")
         for game in gamesRecommender[1:k+1]:
             amountPlayersGames = domainKnowledgeValidation(game[0],gamesNameData,testData)
@@ -42,7 +41,12 @@ def domainKnowledgeValidation(nameGameRecommender, nameGameUser, testData):
     userFilterWithBothGames = validationDataTranspose[(validationDataTranspose[nameGameUser] != 0) & (validationDataTranspose[nameGameRecommender] != 0)]
     return userFilterWithBothGames.shape[0]
 
-def personalization(trainData, gamesNameData, replaceID):
-    _,testMatrix = train(trainData,gamesNameData)
-    #testMatrix.rename(index=replaceID, inplace = True)
-    testMatrix.to_csv('soumteste.csv')
+def personalization():
+    data, nameGameID = treatDataset()
+    trainData, testData = trainTestSplit(data)
+    cosineSimilarityDataFrame = cosineSimilarityMatrix(trainData)
+    similarityMatrix = cosineSimilarityDataFrame.values
+    upperTriangleMatrix = numpy.triu(similarityMatrix, k = 1)
+    print("Personalization: {}".format(1 - meanUpperTriangleMatrix(upperTriangleMatrix)))
+
+personalization()

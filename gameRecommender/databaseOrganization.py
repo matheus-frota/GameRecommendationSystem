@@ -4,7 +4,7 @@ import os
 
 def openCSV():
     columnsNames = ["userID","gameName","purchase","hours","delete"]
-    gamesDataBase = pandas.read_csv("/home/matheus/github/GameRecommendationSystem/data/steamGames.csv", names=columnsNames)
+    gamesDataBase = pandas.read_csv('./data/steamGames.csv', names=columnsNames)
     return gamesDataBase.query("purchase == 'play'").drop(["purchase","delete"],axis = 1)
 
 def usersWithNoPlayTime(sparseMatrixGamesDataBase):

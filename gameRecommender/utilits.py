@@ -1,6 +1,6 @@
 import numpy as np
+import pandas
 from difflib import SequenceMatcher
-
 
 
 def euclidianDistance(x,y):
@@ -26,3 +26,17 @@ def similarNames(gameNameUser, allGamesName):
     else:
         print("Jogo(s) encontrado no banco de dados: {}".format(gamesSimilarNames))
         return allGamesName[gamesSimilarNames[0]]
+
+def cosineSimilarityMatrix(data):
+    cosineSimilarityDictionary = {}
+    for nameColumnGame,valueColumnGame in data.iterrows():
+        temporaryList = []
+        for nameRowGame,valueRowGame in data.iterrows():
+            temporaryList.append(cosineSimilarity(valueColumnGame.values,valueRowGame.values))
+        cosineSimilarityDictionary[nameColumnGame] = temporaryList
+    return pandas.DataFrame.from_dict(cosineSimilarityDictionary)
+
+def meanUpperTriangleMatrix(matrix):
+    totalNumbers = sum(list(range(1,matrix.shape[0])))
+    sumMatrix = matrix.sum()
+    return sumMatrix/totalNumbers
