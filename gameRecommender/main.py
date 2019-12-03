@@ -1,9 +1,9 @@
-from knn import recommender
+from knn import recommender, personalization
 
 def main():
-    k = int(input("Quantos jogos você quer que lhe recomendamos? "))
-    gameName = input("Digite o nome do seu jogo favorito: ")
-
+    k = int(input("How many games do you want to know? "))
+    gameName = input("Enter the name of your favorite game: ")
+    personalization()
     recommender(k,gameName)
 
 main()

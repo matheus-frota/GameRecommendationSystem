@@ -17,13 +17,10 @@ run:
 
 ## Preparing
 build:
-	echo "CREATE DOCKER IMAGE"
-	docker build -t $(IMAGE) .
+	@ echo "CREATE DOCKER IMAGE"
+	@ docker build -t $(IMAGE) .
 
 ## Auxiliary Commands
 mkdir-%:
 	mkdir -p $(PWD)/$*
 	chmod a+w $(PWD)/$*
-
-clean:
-	sudo rm -rf *.pyc __pycache__ build dist gameRecommender.egg-info gameRecommender/__pycache__

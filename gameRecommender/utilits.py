@@ -24,7 +24,7 @@ def similarNames(gameNameUser, allGamesName):
     if len(gamesSimilarNames) == 0:
         return None
     else:
-        print("Jogo(s) encontrado no banco de dados: {}".format(gamesSimilarNames))
+        print("Game(s) found in database: {}".format(gamesSimilarNames))
         return allGamesName[gamesSimilarNames[0]]
 
 def cosineSimilarityMatrix(data):

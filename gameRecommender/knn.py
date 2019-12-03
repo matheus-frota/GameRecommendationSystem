@@ -19,14 +19,14 @@ def recommender(k, gameNameUser):
     trainData, testData = trainTestSplit(data)
     gamesNameData = similarNames(gameNameUser, nameGameID)
     if gamesNameData == None:
-        print("Nenhum jogo com esse nome foi encontrado!")
+        print("No games with this name were found!")
     else:
         gamesRecommender,_ = train(trainData,gamesNameData)
         replaceID = {ID:name for name,ID in zip(nameGameID.keys(),nameGameID.values())}
-        print("-----Recomendações-----\n")
+        print("-----Recommendations-----\n")
         for game in gamesRecommender[1:k+1]:
             amountPlayersGames = domainKnowledgeValidation(game[0],gamesNameData,testData)
-            print("{} - {} usuário(s) possuem ambos os jogos!".format(replaceID[game[0]],amountPlayersGames))
+            print("{} - {} user(s) own both games!".format(replaceID[game[0]],amountPlayersGames))
 
 def trainTestSplit(data, split = 0.4):
     numberColumns = len(data.columns)
@@ -48,5 +48,3 @@ def personalization():
     similarityMatrix = cosineSimilarityDataFrame.values
     upperTriangleMatrix = numpy.triu(similarityMatrix, k = 1)
     print("Personalization: {}".format(1 - meanUpperTriangleMatrix(upperTriangleMatrix)))
-
-personalization()
