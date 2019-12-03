@@ -2,12 +2,9 @@ import pandas
 import numpy
 import os
 
-dataPath = "./Github/GameRecommendationSystem/data/"
-dataName = "steamGames.csv"
-
 def openCSV():
     columnsNames = ["userID","gameName","purchase","hours","delete"]
-    gamesDataBase = pandas.read_csv("C:/Users/Matheus/Desktop/Github/GameRecommendationSystem/data/steamGames.csv", names=columnsNames)
+    gamesDataBase = pandas.read_csv('./data/steamGames.csv', names=columnsNames)
     return gamesDataBase.query("purchase == 'play'").drop(["purchase","delete"],axis = 1)
 
 def usersWithNoPlayTime(sparseMatrixGamesDataBase):
